@@ -97,6 +97,14 @@ int size_of (StackMedicine smed) {
     }
     return size;
 }
+
+int sum_price (StackMedicine smed) {
+    int sum=0;
+    for (NodeMedicine *p = smed.top; p!=NULL; p=p->next) {
+        sum += p->medicine.price;
+    }
+    return sum;
+}
 //Đọc ghi file thuốc
 void input_to_file (StackMedicine smed) {
     fstream f;
@@ -401,8 +409,6 @@ void delete_by_id (StackMedicalRecord &smr) {
     cout << string(TAB_WIDTH, ' ') << "Da xoa (neu co)" << endl;
 }
 //Sửa thông tin HSBA
-void input_to_file (StackMedicalRecord smr);
-void output_from_file (StackMedicalRecord &smr, StackPatient sp, StackMedicine sm);
 void edit_information (StackMedicalRecord &smr, StackPatient sp, StackMedicine sm) {
     string id;
     int chon_hs;
@@ -415,7 +421,7 @@ void edit_information (StackMedicalRecord &smr, StackPatient sp, StackMedicine s
         cout << string(TAB_WIDTH, ' ') << "Khong tim thay ho so" << endl;
         return;
     } else {
-        MedicalRecord new_med, tmp_med;
+        MedicalRecord new_med;
         new_med.input(sp, sm);
 
         p->medical_record = new_med;
@@ -451,6 +457,19 @@ void search_mr_by_patient_id (StackMedicalRecord smr, StackPatient sp) {
             new_stack.top->medical_record.output();
         new_stack.pop();
     }
+}
+//Tinh tong tien theo id
+void sum_price_by_id (StackMedicalRecord smr) {
+    string id; int sum=0;
+    cout << string(TAB_WIDTH, ' ') << "Nhap id: "; cin.ignore(); getline(cin, id);
+
+    for (NodeMedicalRecord *p=smr.top;p!=NULL;p=p->next) {
+        if (p->medical_record.id == id) {
+            sum = sum_price(p->medical_record.stack_medicine);
+            break;
+        }
+    }
+    cout << string(TAB_WIDTH, ' ') << "Tong tien cua ho so " << id << ": " << sum <<"d"<<endl;
 }
 //Đọc ghi file
 void input_to_file (StackMedicalRecord smr) {
@@ -588,7 +607,9 @@ void menu () {
     cout << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "QUAN LY PHONG KHAM" << "|" << endl;
     cout << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "1. Quan ly ho so benh an" << "|" << endl
          << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "2. Quan ly benh nhan" << "|" << endl
-         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "3. Quan ly thuoc" << "|" << endl;
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "3. Quan ly thuoc" << "|" << endl
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "4. Doc toan bo file" << "|" << endl
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "5. Luu toan bo ra file" << "|" << endl;
     cout <<  string(TAB_WIDTH, ' ')  << string(97, '-') << endl;
 }
 void menu_medical_record () {
@@ -599,10 +620,11 @@ void menu_medical_record () {
          << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "3. Them ho so benh an" << "|" << endl
          << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "4. Xoa ho so benh an" << "|" << endl
          << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "5. Sua ho so benh an theo ID" << "|" << endl
-         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "6. Sap xep ho so benh an theo id" << "|" << endl
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "6. Sap xep ho so benh an theo ID" << "|" << endl
          << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "7. Tim kiem ho so cua benh nhan" << "|" << endl
-         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "8. Luu file" << "|" << endl
-         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "9. Doc file" << "|" << endl;
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "8. Tong tien cua hoa don theo ID" << "|" << endl
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "9. Luu file" << "|" << endl
+         << string(TAB_WIDTH, ' ') << "|" << string(TAB_WIDTH, ' ') << setw(WIDTH_MENU) << left << "10. Doc file" << "|" << endl;
     cout << string(TAB_WIDTH, ' ')  << string(97, '-') << endl;
 }
 
@@ -664,9 +686,12 @@ void stack_qly_hsba (StackMedicalRecord &smr, StackPatient sp, StackMedicine sm)
             search_mr_by_patient_id (smr, sp);
             break;
         case 8:
-            input_to_file(smr);
+            sum_price_by_id(smr);
             break;
         case 9:
+            input_to_file(smr);
+            break;
+        case 10:
             output_from_file(smr,sp,sm);
             break;
         
@@ -740,11 +765,10 @@ void stack_qly_thuoc (StackMedicine &sm, StackMedicalRecord smr) {
     } while (chon_m != 0);
 }
 void stack_qly_phong_kham() {
-    StackMedicine s_medicine; s_medicine.init_stack(); output_from_file(s_medicine);
-    StackPatient s_patient; s_patient.init_stack(); output_from_file(s_patient);
+    StackMedicine s_medicine; s_medicine.init_stack(); 
+    StackPatient s_patient; s_patient.init_stack();
     StackMedicalRecord s_medical_record; 
     s_medical_record.init_stack(); 
-    output_from_file(s_medical_record,s_patient,s_medicine);
     
     int chon;
 
@@ -762,7 +786,16 @@ void stack_qly_phong_kham() {
         case 3:
             stack_qly_thuoc(s_medicine, s_medical_record);
             break;
-        
+        case 4:
+            output_from_file(s_medicine);
+            output_from_file(s_patient);
+            output_from_file(s_medical_record,s_patient,s_medicine);
+            break;
+        case 5:
+            input_to_file(s_medicine);
+            input_to_file(s_patient);
+            input_to_file(s_medical_record);
+            break;
         default:
             break;
         }
